@@ -9,9 +9,9 @@ The `.out-of-scope/` directory in a repo stores persistent records of rejected f
 
 ```
 .out-of-scope/
-├── dark-mode.md
-├── plugin-system.md
-└── graphql-api.md
+├── 2025-03-22_dark-mode.md
+├── 2026-02-27_plugin-system.md
+└── 2026-04-19_graphql-api.md
 ```
 
 One file per **concept**, not per issue. Multiple issues requesting the same thing are grouped under one file.
@@ -72,8 +72,8 @@ The reason should be durable. Avoid referencing temporary circumstances ("we're 
 During triage (Step 1: Gather context), read all files in `.out-of-scope/`. When evaluating a new issue:
 
 - Check if the request matches an existing out-of-scope concept
-- Matching is by concept similarity, not keyword — "night theme" matches `dark-mode.md`
-- If there's a match, surface it to the maintainer: "This is similar to `.out-of-scope/dark-mode.md` — we rejected this before because [reason]. Do you still feel the same way?"
+- Matching is by concept similarity, not keyword — "night theme" matches `2025-03-22_dark-mode.md`
+- If there's a match, surface it to the maintainer: "This is similar to `.out-of-scope/2025-03-22_dark-mode.md` — we rejected this before because [reason]. Do you still feel the same way?"
 
 The maintainer may:
 
@@ -83,14 +83,14 @@ The maintainer may:
 
 ## When to write to `.out-of-scope/`
 
-Only when an **enhancement** (not a bug) is rejected as `wontfix`. The flow:
+Only when an **enhancement** (not a bug) is rejected as `out-of-scope`. The flow:
 
 1. Maintainer decides a feature request is out of scope
 2. Check if a matching `.out-of-scope/` file already exists
 3. If yes: append the new issue to the "Prior requests" list
 4. If no: create a new file with the concept name, decision, reason, and first prior request
 5. Post a comment on the issue explaining the decision and mentioning the `.out-of-scope/` file
-6. Close the issue with the `wontfix` label
+6. Close the issue with the `out-of-scope` label
 
 ## Updating or removing out-of-scope files
 

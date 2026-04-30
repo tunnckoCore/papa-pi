@@ -111,13 +111,13 @@ and append "..." to indicate truncation.
 **Summary:** Add `.out-of-scope/` directory support for tracking rejected feature requests
 
 **Current behavior:**
-When a feature request is rejected, the issue is closed with a `wontfix` label
+When a feature request is rejected, the issue is closed with an `out-of-scope` label
 and a comment. There is no persistent record of the decision or reasoning.
 Future similar requests require the maintainer to recall or search for the
 prior discussion.
 
 **Desired behavior:**
-Rejected feature requests should be documented in `.out-of-scope/<concept>.md`
+Rejected feature requests should be documented in `.out-of-scope/YYYY-MM-DD_<concept>.md`
 files that capture the decision, reasoning, and links to all issues that
 requested the feature. When triaging new issues, these files should be
 checked for matches.
@@ -130,7 +130,7 @@ checked for matches.
   and match incoming issues against them by concept similarity
 
 **Acceptance criteria:**
-- [ ] Closing a feature as wontfix creates/updates a file in `.out-of-scope/`
+- [ ] Closing a feature as out-of-scope creates/updates a file in `.out-of-scope/`
 - [ ] The file includes the decision, reasoning, and link to the closed issue
 - [ ] If a matching `.out-of-scope/` file already exists, the new issue is
       appended to its "Prior requests" list rather than creating a duplicate

@@ -5,7 +5,7 @@ description: Triage issues through a state machine driven by triage roles. Use w
 
 # Triage
 
-Move issues on the project issue tracker through a small state machine of triage roles.
+Move issues on the project issue tracker through a small state machine of triage roles. Resolve the tracker using [ISSUE_TRACKER.md](../references/ISSUE_TRACKER.md) and consume domain docs using [DOMAIN_DOCS.md](../references/DOMAIN_DOCS.md).
 
 Every comment or issue posted to the issue tracker during triage **must** start with this disclaimer:
 
@@ -15,8 +15,9 @@ Every comment or issue posted to the issue tracker during triage **must** start 
 
 ## Reference docs
 
-- [AGENT-BRIEF.md](AGENT-BRIEF.md) — how to write durable agent briefs
-- [OUT-OF-SCOPE.md](OUT-OF-SCOPE.md) — how the `.out-of-scope/` knowledge base works
+- [./references/AGENT-BRIEF.md](./references/AGENT-BRIEF.md) — how to write durable agent briefs
+- [./references/TRIAGE-LABELS.md](./references/TRIAGE-LABELS.md) — canonical triage labels and meanings
+- [./references/OUT-OF-SCOPE.md](./references/OUT-OF-SCOPE.md) — how the `.out-of-scope/` knowledge base works
 
 ## Roles
 
@@ -25,19 +26,19 @@ Two **category** roles:
 - `bug` — something is broken
 - `enhancement` — new feature or improvement
 
-Five **state** roles:
+Five **state** roles / labels:
 
 - `needs-triage` — maintainer needs to evaluate
 - `needs-info` — waiting on reporter for more information
 - `ready-for-agent` — fully specified, ready for an AFK agent
 - `ready-for-human` — needs human implementation
-- `wontfix` — will not be actioned
+- `out-of-scope` — will not be actioned
 
-Every triaged issue should carry exactly one category role and one state role. If state roles conflict, flag it and ask the maintainer before doing anything else.
+Every triaged issue should carry exactly one category label and one state label. If state labels conflict, flag it and ask the maintainer before doing anything else.
 
-These are canonical role names — the actual label strings used in the issue tracker may differ. The mapping should have been provided to you - run `/setup-matt-pocock-skills` if not.
+These label strings are canonical for this skill.
 
-State transitions: an unlabeled issue normally goes to `needs-triage` first; from there it moves to `needs-info`, `ready-for-agent`, `ready-for-human`, or `wontfix`. `needs-info` returns to `needs-triage` once the reporter replies. The maintainer can override at any time — flag transitions that look unusual and ask before proceeding.
+State transitions: an unlabeled issue normally goes to `needs-triage` first; from there it moves to `needs-info`, `ready-for-agent`, `ready-for-human`, or `out-of-scope`. `needs-info` returns to `needs-triage` once the reporter replies. The maintainer can override at any time — flag transitions that look unusual and ask before proceeding.
 
 ## Invocation
 
@@ -69,11 +70,11 @@ Show counts and a one-line summary per issue. Let the maintainer pick.
 4. **Grill (if needed).** If the issue needs fleshing out, run a `/grill-with-docs` session.
 
 5. **Apply the outcome:**
-   - `ready-for-agent` — post an agent brief comment ([AGENT-BRIEF.md](AGENT-BRIEF.md)).
+   - `ready-for-agent` — post an agent brief comment (see [./references/AGENT-BRIEF.md](./references/AGENT-BRIEF.md)).
    - `ready-for-human` — same structure as an agent brief, but note why it can't be delegated (judgment calls, external access, design decisions, manual testing).
    - `needs-info` — post triage notes (template below).
-   - `wontfix` (bug) — polite explanation, then close.
-   - `wontfix` (enhancement) — write to `.out-of-scope/`, link to it from a comment, then close ([OUT-OF-SCOPE.md](OUT-OF-SCOPE.md)).
+   - `out-of-scope` (bug) — polite explanation, then close.
+   - `out-of-scope` (enhancement) — write to `.out-of-scope/`, link to it from a comment, then close (see [./references/OUT-OF-SCOPE.md](./references/OUT-OF-SCOPE.md)).
    - `needs-triage` — apply the role. Optional comment if there's partial progress.
 
 ## Quick state override

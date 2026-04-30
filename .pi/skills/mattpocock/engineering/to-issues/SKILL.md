@@ -7,7 +7,7 @@ description: Break a plan, spec, or PRD into independently-grabbable issues on t
 
 Break a plan into independently-grabbable issues using vertical slices (tracer bullets).
 
-The issue tracker and triage label vocabulary should have been provided to you — run `/setup-matt-pocock-skills` if not.
+Resolve the issue tracker using [../references/ISSUE_TRACKER.md](../references/ISSUE_TRACKER.md). Use the triage labels defined by the `triage` skill; new issues enter triage with `needs-triage` unless the user says otherwise.
 
 ## Process
 
@@ -17,7 +17,7 @@ Work from whatever is already in the conversation context. If the user passes an
 
 ### 2. Explore the codebase (optional)
 
-If you have not already explored the codebase, do so to understand the current state of the code. Issue titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
+If you have not already explored the codebase, do so to understand the current state of the code. Consume domain docs using [../references/DOMAIN_DOCS.md](../references/DOMAIN_DOCS.md). Issue titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
 
 ### 3. Draft vertical slices
 
