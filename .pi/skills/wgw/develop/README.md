@@ -1,5 +1,7 @@
 # Engineering
 
+_NOTE: fork of Matt Pocock's Engineering Skills._
+
 Skills I use daily for code work.
 
 - **[diagnose](./diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions: reproduce → minimise → hypothesise → instrument → fix → regression-test.
