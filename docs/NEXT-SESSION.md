@@ -16,6 +16,7 @@ Start from the accepted model:
 - `PI_CODING_AGENT_DIR=/home/agent/.config/pi/agent`.
 - `PI_AGENT_*_DIR` env vars point at memory/world/decisions/sessions.
 - Pi starts with cwd `/home/agent`.
+- Do not rely on `BASH_ENV`, aliases, or shell functions to rewrite `pi`; nested launches should use `papa`.
 - Heartbeat uses `memory/HEARTBEAT.md` and runs without Pi sessions.
 
 ## Do not reopen unless necessary

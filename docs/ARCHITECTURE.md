@@ -99,7 +99,7 @@ Pi is launched with:
 pi --session-dir "$PI_AGENT_SESSIONS_DIR"
 ```
 
-Nested agent launches should use the trusted launcher again rather than relying on shell aliases that rewrite `pi`.
+Nested agent launches should use the trusted launcher again rather than relying on shell aliases, `BASH_ENV`, or shell functions that rewrite `pi`. The launcher may pass `--session-dir` when it invokes Pi, but it should not depend on shell startup files inside the sandbox for correctness.
 
 ## Execution modes
 
