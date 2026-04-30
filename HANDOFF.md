@@ -2,8 +2,8 @@
 
 Read these first:
 
-1. [`CONTEXT.md`](../CONTEXT.md) — canonical language and resolved terms.
-2. [`ARCHITECTURE.md`](../ARCHITECTURE.md) — accepted system architecture and scaffolds.
+1. [`CONTEXT.md`](./CONTEXT.md) — canonical language and resolved terms.
+2. [`README.md`](./README.md) — accepted system architecture and scaffolds.
 3. [`docs/adr/`](./adr/) — durable decisions and rationale.
 
 ## Next focus
