@@ -4,11 +4,11 @@ Read these first:
 
 1. [`CONTEXT.md`](./CONTEXT.md) — canonical language and resolved terms.
 2. [`README.md`](./README.md) — accepted system architecture and scaffolds.
-3. [`docs/adr/`](./adr/) — durable decisions and rationale.
+3. [`docs/adr/`](./docs/adr/) — durable decisions and rationale.
 
 ## Next focus
 
-Design the trusted `papa` launcher.
+Design the bash `papa` launcher/cli.
 
 Start from the accepted model:
 

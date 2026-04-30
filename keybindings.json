@@ -1,9 +1,0 @@
-{
-  "app.clear": ["ctrl+d"],
-  "app.exit": ["ctrl+x"],
-  "app.thinking.toggle": ["ctrl+f"],
-  "app.thinking.cycle": ["ctrl+t"],
-  "tui.input.copy": ["ctrl+c", "ctrl+shift+c"],
-  "tui.editor.deleteWordBackward": ["ctrl+backspace"],
-  "tui.editor.deleteWordForward": ["ctrl+delete"]
-}
