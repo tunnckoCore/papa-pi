@@ -1,0 +1,3 @@
+# Use whole-process bubblewrap for agent containment
+
+We will run each autonomous Pi agent by launching the entire Pi process inside a Bubblewrap sandbox, with the agent's system home mounted as `/home/agent`. Extension-only sandboxing was rejected because Pi extensions run inside the main Pi process and can use host Node.js APIs before tool-level guards apply; container-based isolation was rejected for now as too heavy. Whole-process Bubblewrap keeps the model simple: agents may self-modify their own harness, skills, extensions, memory, and work, but the OS namespace prevents access to other agents and the host filesystem.
