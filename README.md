@@ -13,7 +13,7 @@ This document describes a local system for running standalone, autonomous, self-
 
 ## Core decision
 
-Each agent runs inside a whole-process Bubblewrap sandbox. The trusted launcher starts Pi inside the sandbox, with exactly one agent system home mounted as `/home/agent`.
+Each agent runs inside a whole-process Bubblewrap sandbox. `papa` starts Pi inside the sandbox, with exactly one agent system home mounted as `/home/agent`.
 
 ```text
 host
@@ -23,7 +23,7 @@ not mounted:
   ~/agents/alice
   ~/agents/chandler
   host $HOME
-  trusted launcher/runtime
+  papa command/runtime
 ```
 
 Because Pi itself is inside Bubblewrap, any code loaded by Pi, including agent-owned extensions, is also contained.
@@ -82,7 +82,7 @@ The system home itself is not a Git repository.
 
 ## Runtime environment
 
-The trusted launcher sets:
+`papa` sets:
 
 ```bash
 HOME=/home/agent
@@ -99,11 +99,25 @@ Pi is launched with:
 pi --session-dir "$PI_AGENT_SESSIONS_DIR"
 ```
 
-Nested agent launches should use the trusted launcher again rather than relying on shell aliases, `BASH_ENV`, or shell functions that rewrite `pi`. The launcher may pass `--session-dir` when it invokes Pi, but it should not depend on shell startup files inside the sandbox for correctness.
+Nested agent launches should use `papa` again rather than relying on shell aliases, `BASH_ENV`, or shell functions that rewrite `pi`. `papa` may pass `--session-dir` when it invokes Pi, but it should not depend on shell startup files inside the sandbox for correctness.
+
+## Agent creation
+
+Normal launch is fail-fast: `papa <agent-name>` requires an existing Agent System Home and must not silently create one.
+
+Agent creation is deferred from the first `papa` implementation. The likely direction is Pi-assisted creation tooling that uses a `skel/` starter tree and an Agent Creation Run to collect the agent's name, handle, identity, persona, skills, domains, and operating expectations. The creation tooling should keep `papa` small rather than making the shell script responsible for rich template population.
+
+The skeleton directory is:
+
+```text
+skel/
+```
+
+`skel/` follows Unix `/etc/skel` semantics: it is a starter filesystem tree copied into a new Agent System Home.
 
 ## Execution modes
 
-The same agent home supports three modes.
+The same agent home supports three normal run modes.
 
 ### Standalone interactive
 
@@ -120,7 +134,7 @@ papa bob -p "Review this design"
 papa bob --json -p "Act as a specialist and return your findings"
 ```
 
-A parent Pi session can call the trusted launcher to spawn a specialist agent. The specialist uses its own config, memory, extensions, skills, and sessions.
+A parent Pi session can call `papa` to spawn a specialist agent. The specialist uses its own config, memory, extensions, skills, and sessions.
 
 ### Autonomous heartbeat
 
@@ -146,14 +160,14 @@ $PI_CODING_AGENT_DIR/decisions/
 
 ## Bubblewrap containment model
 
-The launcher mounts the selected agent system home writable:
+`papa` mounts the selected agent system home writable:
 
 ```bash
 --bind ~/agents/bob /home/agent
 --chdir /home/agent
 ```
 
-It mounts system paths read-only as needed for tools to run. The launcher should auto-detect host layout and add read-only mounts conditionally, for example:
+It mounts system paths read-only as needed for tools to run. `papa` should auto-detect host layout and add read-only mounts conditionally, for example:
 
 ```bash
 --share-net                                         # share host network
@@ -212,9 +226,20 @@ Credentials mounted inside the agent home are agent-owned capabilities. Examples
 
 The sandbox protects the host and other agents from an agent. It does not protect the agent from misusing its own credentials.
 
+## `papa` command location
+
+`papa` is installed on the host as:
+
+```text
+~/.local/bin/papa
+```
+
+During development, the `papa` script lives in this repository and may be copied or symlinked into `~/.local/bin/papa`. The installed command remains outside all Agent System Homes and is not writable from inside any agent sandbox.
+
 ## Open design areas
 
-- Exact `papa` launcher implementation.
+- Exact `papa` implementation.
+- Agent creation flow and exact Agent Skeleton contents.
 - Exact Bubblewrap mount matrix across distros.
 - Heartbeat scheduler implementation.
 - Subagent Pi extension API for calling `papa`.

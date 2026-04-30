@@ -1,0 +1,173 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat >&2 <<'EOF'
+Usage:
+  papa <agent-name> [pi args...]
+  papa <agent-name> --heartbeat [pi args...]
+
+Environment:
+  PAPA_AGENTS_DIR   Host directory containing agent homes. Defaults to $HOME/agents.
+EOF
+}
+
+die() {
+  echo "papa: $*" >&2
+  exit 1
+}
+
+have_cmd() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+add_ro_bind_if_exists() {
+  local path="$1"
+  if [[ -e "$path" ]]; then
+    bwrap_args+=(--ro-bind "$path" "$path")
+  fi
+}
+
+add_path_if_dir() {
+  local path="$1"
+  if [[ -d "$path" ]]; then
+    sandbox_path+="${sandbox_path:+:}$path"
+  fi
+}
+
+[[ $# -gt 0 ]] || { usage; exit 2; }
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+esac
+
+agent_name="$1"
+shift
+
+[[ "$agent_name" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]] || die "invalid agent name: $agent_name"
+
+agents_root="${PAPA_AGENTS_DIR:-$HOME/agents}"
+agent_home="$agents_root/$agent_name"
+
+[[ -d "$agent_home" ]] || die "agent '$agent_name' does not exist at $agent_home"
+
+have_cmd bwrap || die "bubblewrap not found; install bwrap"
+
+heartbeat=0
+forwarded_args=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --heartbeat)
+      heartbeat=1
+      shift
+      ;;
+    -p|--prompt)
+      if [[ "$heartbeat" -eq 1 ]]; then
+        die "--heartbeat reads HEARTBEAT.md; do not pass $1"
+      fi
+      forwarded_args+=("$1")
+      shift
+      if [[ $# -eq 0 ]]; then
+        die "$1 requires an argument"
+      fi
+      forwarded_args+=("$1")
+      shift
+      ;;
+    --prompt=*)
+      if [[ "$heartbeat" -eq 1 ]]; then
+        die "--heartbeat reads HEARTBEAT.md; do not pass --prompt"
+      fi
+      forwarded_args+=("$1")
+      shift
+      ;;
+    *)
+      forwarded_args+=("$1")
+      shift
+      ;;
+  esac
+
+done
+
+if [[ "$heartbeat" -eq 1 ]]; then
+  for arg in "${forwarded_args[@]}"; do
+    case "$arg" in
+      -p|--prompt|--prompt=*)
+        die "--heartbeat reads HEARTBEAT.md; do not pass prompt args"
+        ;;
+    esac
+  done
+fi
+
+sandbox_path=""
+add_path_if_dir /home/agent/node_modules/.bin
+add_path_if_dir /home/agent/.local/bin
+add_path_if_dir /run/current-system/sw/bin
+add_path_if_dir /nix/var/nix/profiles/default/bin
+add_path_if_dir /usr/local/bin
+add_path_if_dir /usr/bin
+add_path_if_dir /bin
+
+bwrap_args=(
+  --die-with-parent
+  --unshare-all
+  --share-net
+  --new-session
+  --proc /proc
+  --dev /dev
+  --tmpfs /tmp
+)
+
+add_ro_bind_if_exists /usr
+add_ro_bind_if_exists /bin
+add_ro_bind_if_exists /lib
+add_ro_bind_if_exists /lib64
+add_ro_bind_if_exists /etc/ssl
+add_ro_bind_if_exists /etc/ca-certificates
+add_ro_bind_if_exists /etc/resolv.conf
+add_ro_bind_if_exists /etc/nsswitch.conf
+add_ro_bind_if_exists /etc/hosts
+add_ro_bind_if_exists /nix
+add_ro_bind_if_exists /run/current-system
+
+bwrap_args+=(
+  --bind "$agent_home" /home/agent
+  --chdir /home/agent
+  --clearenv
+  --setenv HOME /home/agent
+  --setenv USER agent
+  --setenv LOGNAME agent
+  --setenv SHELL /bin/bash
+  --setenv PATH "$sandbox_path"
+  --setenv PWD /home/agent
+  --setenv PI_CODING_AGENT_DIR /home/agent/.config/pi/agent
+  --setenv PI_AGENT_SESSIONS_DIR /home/agent/.config/pi/sessions
+  --setenv PI_AGENT_MEMORY_DIR /home/agent/.config/pi/agent/memory
+  --setenv PI_AGENT_WORLD_DIR /home/agent/.config/pi/agent/world
+  --setenv PI_AGENT_DECISIONS_DIR /home/agent/.config/pi/agent/decisions
+)
+
+# for name in TERM COLORTERM NO_COLOR FORCE_COLOR HTTP_PROXY HTTPS_PROXY ALL_PROXY NO_PROXY http_proxy https_proxy all_proxy no_proxy; do
+#   if [[ -v "$name" ]]; then
+#     bwrap_args+=(--setenv "$name" "${!name}")
+#   fi
+# done
+
+pi_bin=/home/agent/node_modules/.bin/pi
+
+if [[ "$heartbeat" -eq 1 ]]; then
+  exec bwrap "${bwrap_args[@]}" /bin/bash -c '
+    set -euo pipefail
+    prompt_file="$PI_AGENT_MEMORY_DIR/HEARTBEAT.md"
+    if [[ ! -s "$prompt_file" ]]; then
+      echo "papa: heartbeat prompt missing or empty: $prompt_file" >&2
+      exit 1
+    fi
+    prompt="$(cat "$prompt_file")"
+    exec /home/agent/node_modules/.bin/pi "$@" --session-dir "$PI_AGENT_SESSIONS_DIR" --no-session -p "$prompt"
+  ' bash "${forwarded_args[@]}"
+else
+  exec bwrap "${bwrap_args[@]}" "$pi_bin" "${forwarded_args[@]}" --session-dir /home/agent/.config/pi/sessions
+fi
